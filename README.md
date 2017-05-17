@@ -8,11 +8,35 @@ Autoplay uses 'Record - Playing' model. you can **record** your inputs in test s
 
 you can make this process automatic by using command line script. moreover, you can integrate this automatic test into your build process.
 
+if you want how autoplay works, See Example project. it contains various autoplay test cases.
+
 ## Install
 
+1. Copy Autoplay plugin into your project's Plugins folder.
+
 ## How to use
+
+1. after install the autoplay plugin, open Project Setting - General - change Game Viewport Client Class to **AutoplayGameViewportClient**
+2. make your test scene.
+3. test scene must have one Autoplay manager. add Autoplay manager Actor into the scene.
+4. if you play that test scene in PIE mode, it automatically record your all inputs into Tests/(sceneName).json file.
+5. play that level with **-autoplay** commandline argument, it playing your recorded input.
+6. when play ended, testing results saved in Tests/Result/result.json file.
+
+but manual test is not recommended. use script file(autoplay.py) to check test case.
+
+### Check Test Case
+
+you can use these functions.
+
+- AutoplayManager::Assert
+- AutoplayManager::ShouldExecute
+- AutoplayManager::Routine
+
+## How to use Autoplay script
 
 ## TO DO
 - [ ] record VR HMD & motion controller input
 - [ ] network test
+- [ ] check unreal engine log & game crash
 - [ ] integrate unreal engine automation test framework
