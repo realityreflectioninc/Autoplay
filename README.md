@@ -38,6 +38,13 @@ you can use these functions to check your input works correctly.
 
 ## How to use Autoplay script
 
+### Config fields
+
+- Use Editor : if true, use UE4Editor.exe to play test case. if false, it considered Project field value as executable file(build binary file).
+- Editor Path : path that UE4Editor.exe exists. if Use Editor field set false, this field ignored.
+- Project : test project name. you can use absolute path or relative path.
+- Autoplay : test case list. for example, if you set this field to [ "MoveTest", "ShootTest", "DeadTest" ], Autoplay will test these three case step by step(MoveTest.umap & MoveTest.json, ShootTest.umap & ShootTest.json, DeadTest.umap & DeadTest.json) and print all test results.
+
 ## TO DO
 - [ ] record VR HMD & motion controller input
 - [ ] network test

@@ -1,0 +1,25 @@
+{
+	"FileVersion": 3,
+	"Version": 3,
+	"VersionName": "1.0.0",
+	"FriendlyName": "Autoplay",
+	"Description": "",
+	"Category": "Test",
+	"CreatedBy": "",
+	"CreatedByURL": "",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"EnabledByDefault": true,
+	"CanContainContent": false,
+	"IsBetaVersion": false,
+	"Installed": false,
+	"Modules": 
+	[
+        	{
+			"Name": "Autoplay",
+			"Type": "Runtime",
+			"LoadingPhase": "PreDefault"
+		}
+	]
+}

@@ -2,6 +2,7 @@
 
 #include "ModuleManager.h"
 
+#include "Engine.h"
 #include "AutoplayManager.h"
 #include "AutoplayRecord.h"
 #include "AutoplayResult.h"

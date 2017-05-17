@@ -34,6 +34,8 @@ with open(config_path) as config_file:
     config = json.load(config_file)
 
 editor_path = os.path.join(config["EditorPath"], "UE4Editor.exe")
+passed = 0
+failed = 0
 
 # auto play
 for level in config["Autoplay"]:
@@ -45,8 +47,10 @@ for level in config["Autoplay"]:
         result = json.load(result_file)
 
     if isPassTest(result):
+        passed+=1
         print(level, "result :" + bcolors.OKGREEN, "pass", bcolors.ENDC)
     else:
+        failed+=1
         print(level, "result :" + bcolors.FAIL, "fail", bcolors.ENDC)
         for message in result["FailedAssertions"]:
             print("\tassertion failed :", message)
@@ -54,3 +58,5 @@ for level in config["Autoplay"]:
         for routine in result["RoutineCheckList"].items():
             if routine[1] is 0:
                 print("\troutine not execute :", routine[0])
+
+print(bcolors.HEADER + "test result : pass", passed, "cases, fail", failed, "cases" + bcolors.ENDC)
