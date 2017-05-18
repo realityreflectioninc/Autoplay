@@ -1,13 +1,11 @@
 <h1 align="center"> Autoplay </h1>
 <p align="center">:warning: this project is work in progress!</p>
 
-In game development, Testing is very hard. sometimes, it even looks as if impossible. why testing in game is difficult? because, making test case of complex, stateful features is very hard. and almost game features are very complex & stateful. we want to test this complex, stateful game features more easily. so, we make **AUTO PLAY**! with Autoplay, you can make some kind of these test cases more easily.
+In game development, Testing is very hard. sometimes, it even looks as if impossible. why testing in game is so difficult? because, making test case of complex & stateful features is very hard, and almost whole game features are very complex & stateful. we want to test this kind of game features more easily. so, we make **AUTOPLAY**! with Autoplay, you can make test cases about complex, stateful game features more easily.
 
 ## Concept
 
 Autoplay uses **Record - Playing** model. you can *record* your inputs in test level. after that, you can *play* your inputs and check that works correctly.
-
-you can make this process automatically by using command line script. moreover, you can integrate this automatic test into your build process.
 
 if you want to see how Autoplay works, See Example project. it contains various Autoplay test cases.
 
@@ -26,7 +24,7 @@ in auto play, one level is one test case. record your input and play that inputs
 4. play that level with **-autoplay** commandline argument, it playing your recorded input.
 5. when play ended, testing results saved in Tests/Result/result.json file.
 
-but manual test is not recommended. use script file(autoplay.py) to check test case.
+but manual test is not recommended. use script file(autoplay.py) to check your test case set.
 
 ### Check Test Case
 
@@ -48,8 +46,9 @@ first, you make your script's configuration file(json format). configuration opt
 - Autoplay : test case list. for example, if you set this field to [ "MoveTest", "ShootTest", "DeadTest" ], Autoplay will test these three case step by step(MoveTest.umap & MoveTest.json, ShootTest.umap & ShootTest.json, DeadTest.umap & DeadTest.json) and print all test results.
 
 ## TO DO
-- [ ] record VR HMD & motion controller input
+- [ ] record, play VR HMD & motion controller input
 - [ ] track mouse position
 - [ ] network test
+- [ ] work with CI tools
 - [ ] check unreal engine log & game crash
 - [ ] integrate unreal engine automation test framework
