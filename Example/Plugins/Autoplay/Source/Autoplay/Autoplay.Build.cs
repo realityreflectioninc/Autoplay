@@ -8,7 +8,7 @@ public class Autoplay : ModuleRules
 		PrivateIncludePaths.AddRange(new string[] { "Autoplay/Private" });
 		PublicIncludePaths.AddRange(new string[] { "Autoplay/Public" });
 
-		PublicDependencyModuleNames.AddRange(new string[] { "Engine", "Core", "CoreUObject", "Engine", "InputCore", "Json", "JsonUtilities" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Engine", "Core", "CoreUObject", "Engine", "InputCore", "InputDevice", "Json", "JsonUtilities", "HeadMountedDisplay" });
 		PrivateDependencyModuleNames.AddRange(new string[] { });
     }
 }

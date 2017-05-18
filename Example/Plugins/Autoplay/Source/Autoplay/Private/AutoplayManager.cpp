@@ -69,3 +69,13 @@ void AAutoplayManager::Routine(const FString& Name)
 
 	viewport->Check(Name);
 }
+
+void AAutoplayManager::SetVRRecordEnable(bool Enable)
+{
+	auto viewport = Cast<UAutoplayGameViewportClient>(GEngine->GameViewport);
+
+	if (viewport == nullptr || viewport->GetState() != EAutoplayState::Recording)
+		return;
+
+	viewport->SetVRRecordEnable(Enable);
+}

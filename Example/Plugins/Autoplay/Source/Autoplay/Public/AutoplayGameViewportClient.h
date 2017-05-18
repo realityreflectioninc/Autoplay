@@ -5,6 +5,7 @@
 #include "Engine/GameViewportClient.h"
 #include "AutoplayRecord.h"
 #include "AutoplayResult.h"
+#include "IMotionController.h"
 #include "AutoplayGameViewportClient.generated.h"
 
 UENUM()
@@ -57,18 +58,83 @@ public:
 			*val = *val + 1;
 	}
 
+	void SetVRRecordEnable(bool enable) { bVRRecord = enable; }
+
 	void InitLevel(const FString& MapName);
 
 	void SaveResult();
 
+	bool IsFinishPlaying() const;
+
+	void RecordMotionController(EControllerHand Hand, ETrackingStatus TrackingStatus, const FVector& Position, const FRotator& Orientation);
+	void RecordHMD(ETrackingStatus TrackingStatus, const FVector& Position, const FRotator& Orientation);
+
+	FVector GetMotionControllerPosition(EControllerHand Hand) const
+	{
+		switch (Hand)
+		{
+		case EControllerHand::Left:
+			if (Records.LeftInputs.Num() == 0)
+				return FVector::ZeroVector;
+
+			return Records.LeftInputs[FMath::Min(LeftPlayIndex, Records.LeftInputs.Num() - 1)].Position;
+		case EControllerHand::Right:
+			if (Records.RightInputs.Num() == 0)
+				return FVector::ZeroVector;
+
+			return Records.RightInputs[FMath::Min(LeftPlayIndex, Records.RightInputs.Num() - 1)].Position;
+		}
+		return FVector::ZeroVector;
+	}
+
+	FRotator GetMotionControllerOrientation(EControllerHand Hand)
+	{
+		switch (Hand)
+		{
+		case EControllerHand::Left:
+			if (Records.LeftInputs.Num() == 0)
+				return FRotator::ZeroRotator;
+
+			return Records.LeftInputs[FMath::Min(LeftPlayIndex, Records.LeftInputs.Num() - 1)].Orientation;
+		case EControllerHand::Right:
+			if (Records.RightInputs.Num() == 0)
+				return FRotator::ZeroRotator;
+
+			return Records.RightInputs[FMath::Min(LeftPlayIndex, Records.RightInputs.Num() - 1)].Orientation;
+		}
+		return FRotator::ZeroRotator;
+	}
+
+	ETrackingStatus GetMotionControllerTrackingStatus(EControllerHand Hand)
+	{
+		switch (Hand)
+		{
+		case EControllerHand::Left:
+			if (Records.LeftInputs.Num() == 0)
+				return ETrackingStatus::NotTracked;
+
+			return Records.LeftInputs[FMath::Min(LeftPlayIndex, Records.LeftInputs.Num() - 1)].TrackingStatus;
+		case EControllerHand::Right:
+			if (Records.RightInputs.Num() == 0)
+				return ETrackingStatus::NotTracked;
+
+			return Records.RightInputs[FMath::Min(LeftPlayIndex, Records.RightInputs.Num() - 1)].TrackingStatus;
+		}
+		return ETrackingStatus::NotTracked;
+	}
+
 private:
-	int PlayIndex;
+	int InputPlayIndex;
+	int HMDPlayIndex;
+	int LeftPlayIndex;
+	int RightPlayIndex;
 
 	FString TestMapName;
 	EAutoplayState State;
 
 	bool bCompleteLoadRecords = false;
+	bool bVRRecord = false;
 
-	TArray<FAutoplayRecord> Records;
+	FAutoplayRecord Records;
 	FAutoplayResult Result;
 };

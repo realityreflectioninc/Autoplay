@@ -3,16 +3,9 @@
 #pragma once
 
 #include "Engine/GameViewportClient.h"
+#include "AutoplayInputRecord.h"
+#include "AutoplayVRRecord.h"
 #include "AutoplayRecord.generated.h"
-
-UENUM()
-enum class EAutoplayEventType : uint8
-{
-	Key,
-	Axis,
-	Char
-};
-
 /**
  * 
  */
@@ -22,37 +15,15 @@ struct AUTOPLAY_API FAutoplayRecord
 	GENERATED_USTRUCT_BODY()
 
 public:
-
 	UPROPERTY()
-	EAutoplayEventType Type;
-
+	TArray<FAutoplayInputRecord> Inputs;
+	
 	UPROPERTY()
-	float Time;
-
+	TArray<FAutoplayVRRecord> HMDInputs;
+	
 	UPROPERTY()
-	int ControllerId = 0;
-
+	TArray<FAutoplayVRRecord> LeftInputs;
+	
 	UPROPERTY()
-	FKey Key = EKeys::AnyKey;
-
-	UPROPERTY()
-	TEnumAsByte<EInputEvent> EventType = EInputEvent::IE_MAX;
-
-	UPROPERTY()
-	float AmountDepressed = 0.0f;
-
-	UPROPERTY()
-	bool bGamepad = false;
-
-	UPROPERTY()
-	float Delta = 0.0f;
-
-	UPROPERTY()
-	float DeltaTime = 0.0f;
-
-	UPROPERTY()
-	int NumSamples = 0;
-
-	UPROPERTY()
-	FString Character;
+	TArray<FAutoplayVRRecord> RightInputs;
 };

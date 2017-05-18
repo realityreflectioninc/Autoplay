@@ -30,5 +30,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Autoplay")
 	static void Routine(const FString& Name);
+
+	UFUNCTION(BlueprintCallable, Category = "Autoplay")
+	static void SetVRRecordEnable(bool Enable);
 	
 };

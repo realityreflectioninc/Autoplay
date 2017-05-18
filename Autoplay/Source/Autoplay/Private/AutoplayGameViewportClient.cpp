@@ -10,7 +10,7 @@ bool UAutoplayGameViewportClient::InputKey(FViewport* Viewport, int32 Controller
 {
 	if (State == EAutoplayState::Recording)
 	{
-		FAutoplayRecord record;
+		FAutoplayInputRecord record;
 		
 		record.Time = UGameplayStatics::GetRealTimeSeconds(GetWorld());
 		record.Type = EAutoplayEventType::Key;
@@ -20,7 +20,7 @@ bool UAutoplayGameViewportClient::InputKey(FViewport* Viewport, int32 Controller
 		record.AmountDepressed = AmountDepressed;
 		record.bGamepad = bGamepad;
 
-		Records.Add(record);
+		Records.Inputs.Add(record);
 	}
 
 	return Super::InputKey(Viewport, ControllerId, Key, EventType, AmountDepressed, bGamepad);
@@ -30,7 +30,7 @@ bool UAutoplayGameViewportClient::InputAxis(FViewport* Viewport, int32 Controlle
 {
 	if (State == EAutoplayState::Recording)
 	{
-		FAutoplayRecord record;
+		FAutoplayInputRecord record;
 
 		record.Time = UGameplayStatics::GetRealTimeSeconds(GetWorld());
 		record.Type = EAutoplayEventType::Axis;
@@ -42,7 +42,7 @@ bool UAutoplayGameViewportClient::InputAxis(FViewport* Viewport, int32 Controlle
 		record.NumSamples = NumSamples;
 		record.bGamepad = bGamepad;
 
-		Records.Add(record);
+		Records.Inputs.Add(record);
 	}
 
 	return Super::InputAxis(Viewport, ControllerId, Key, Delta, DeltaTime, NumSamples, bGamepad);
@@ -52,14 +52,14 @@ bool UAutoplayGameViewportClient::InputChar(FViewport* Viewport, int32 Controlle
 {
 	if (State == EAutoplayState::Recording)
 	{
-		FAutoplayRecord record;
+		FAutoplayInputRecord record;
 
 		record.Time = UGameplayStatics::GetRealTimeSeconds(GetWorld());
 		record.Type = EAutoplayEventType::Char;
 		record.EventType = IE_MAX;
 		record.Character.AppendChar(Character);
 
-		Records.Add(record);
+		Records.Inputs.Add(record);
 	}
 
 	return Super::InputChar(Viewport, ControllerId, Character);
@@ -87,7 +87,7 @@ void UAutoplayGameViewportClient::Tick(float DeltaTime)
 		//시간 되면 키 입력 재생해주기
 		float time = UGameplayStatics::GetRealTimeSeconds(GetWorld());
 
-		if (Records.Num() <= PlayIndex)
+		if (IsFinishPlaying())
 		{
 			SaveResult();
 
@@ -130,23 +130,29 @@ void UAutoplayGameViewportClient::Tick(float DeltaTime)
 			return;
 		}
 
-		while (PlayIndex < Records.Num() && Records[PlayIndex].Time < time)
+		while (InputPlayIndex < Records.Inputs.Num() && Records.Inputs[InputPlayIndex].Time < time)
 		{
-			switch (Records[PlayIndex].Type)
+			switch (Records.Inputs[InputPlayIndex].Type)
 			{
 			case EAutoplayEventType::Key:
-				InputKey(Viewport, Records[PlayIndex].ControllerId, Records[PlayIndex].Key, Records[PlayIndex].EventType, Records[PlayIndex].AmountDepressed, Records[PlayIndex].bGamepad);
+				InputKey(Viewport, Records.Inputs[InputPlayIndex].ControllerId, Records.Inputs[InputPlayIndex].Key, Records.Inputs[InputPlayIndex].EventType, Records.Inputs[InputPlayIndex].AmountDepressed, Records.Inputs[InputPlayIndex].bGamepad);
 				break;
 			case EAutoplayEventType::Axis:
-				InputAxis(Viewport, Records[PlayIndex].ControllerId, Records[PlayIndex].Key, Records[PlayIndex].Delta, Records[PlayIndex].DeltaTime, Records[PlayIndex].NumSamples, Records[PlayIndex].bGamepad);
+				InputAxis(Viewport, Records.Inputs[InputPlayIndex].ControllerId, Records.Inputs[InputPlayIndex].Key, Records.Inputs[InputPlayIndex].Delta, Records.Inputs[InputPlayIndex].DeltaTime, Records.Inputs[InputPlayIndex].NumSamples, Records.Inputs[InputPlayIndex].bGamepad);
 				break;
 			case EAutoplayEventType::Char:
-				InputChar(Viewport, Records[PlayIndex].ControllerId, Records[PlayIndex].Character[0]);
+				InputChar(Viewport, Records.Inputs[InputPlayIndex].ControllerId, Records.Inputs[InputPlayIndex].Character[0]);
 				break;
 			}
 
-			PlayIndex++;
+			InputPlayIndex++;
 		}
+
+		while (LeftPlayIndex < Records.LeftInputs.Num() && Records.LeftInputs[LeftPlayIndex].Time < time)
+			LeftPlayIndex++;
+
+		while (RightPlayIndex < Records.RightInputs.Num() && Records.RightInputs[RightPlayIndex].Time < time)
+			RightPlayIndex++;
 	}
 }
 
@@ -155,9 +161,6 @@ void UAutoplayGameViewportClient::Init(struct FWorldContext& WorldContext, UGame
 	Super::Init(WorldContext, OwningGameInstance, bCreateNewAudioDevice);
 
 	TActorIterator<AAutoplayManager> iter(GetWorld());
-
-	Records.Reset();
-	Result = FAutoplayResult();
 
 	if (FParse::Param(FCommandLine::Get(), TEXT("autoplay")))
 	{
@@ -177,22 +180,14 @@ void UAutoplayGameViewportClient::BeginDestroy()
 {
 	if (State == EAutoplayState::Recording)
 	{
-		TArray<TSharedPtr<FJsonValue>> serializedData;
-		for (auto& r : Records)
-		{
-			TSharedRef<FJsonValueObject> jsonValue = MakeShareable(new FJsonValueObject(FJsonObjectConverter::UStructToJsonObject(r)));
-			serializedData.Add(jsonValue);
-		}
+		FString jsonString;
 
-		FString outputString;
-		TSharedRef< TJsonWriter<> > writer = TJsonWriterFactory<>::Create(&outputString);
-
-		if (FJsonSerializer::Serialize(serializedData, writer))
+		if (FJsonObjectConverter::UStructToJsonObjectString(Records, jsonString))
 		{
 			auto directory = FPaths::Combine(FPaths::GameDir(), "Tests");
 			auto path = FPaths::Combine(directory, TestMapName + ".json");
 
-			FFileHelper::SaveStringToFile(outputString, *path);
+			FFileHelper::SaveStringToFile(jsonString, *path);
 		}
 	}
 
@@ -210,8 +205,8 @@ void UAutoplayGameViewportClient::LoadRecords()
 	auto path = FPaths::Combine(directory, TestMapName + ".json");
 	FFileHelper::LoadFileToString(str, *path);
 
-	FJsonObjectConverter::JsonArrayStringToUStruct(str, &Records, 0, 0);
-	PlayIndex = 0;
+	FJsonObjectConverter::JsonObjectStringToUStruct(str, &Records, 0, 0);
+	InputPlayIndex = 0;
 
 	bCompleteLoadRecords = true;
 }
@@ -228,4 +223,48 @@ void UAutoplayGameViewportClient::SaveResult()
 	auto path = FPaths::Combine(directory, TestMapName + ".json");
 
 	FFileHelper::SaveStringToFile(Result.ToJson(false), *path);
+	Result = FAutoplayResult();
+}
+
+bool UAutoplayGameViewportClient::IsFinishPlaying() const
+{
+	if (InputPlayIndex < Records.Inputs.Num())
+		return false;
+
+	if (HMDPlayIndex < Records.HMDInputs.Num())
+		return false;
+
+	if (LeftPlayIndex < Records.LeftInputs.Num())
+		return false;
+
+	if (RightPlayIndex < Records.RightInputs.Num())
+		return false;
+
+	return true;
+}
+
+void UAutoplayGameViewportClient::RecordMotionController(EControllerHand Hand, ETrackingStatus TrackingStatus, const FVector& Position, const FRotator& Orientation)
+{
+	if (!bVRRecord)
+		return;
+
+	FAutoplayVRRecord record;
+	record.Time = UGameplayStatics::GetRealTimeSeconds(GetWorld());
+	record.TrackingStatus = TrackingStatus;
+	record.Position = Position;
+	record.Orientation = Orientation;
+
+	switch (Hand)
+	{
+	case EControllerHand::Left:
+		Records.LeftInputs.Add(record);
+		break;
+	case EControllerHand::Right:
+		Records.RightInputs.Add(record);
+		break;
+	}
+}
+
+void UAutoplayGameViewportClient::RecordHMD(ETrackingStatus TrackingStatus, const FVector& Position, const FRotator& Orientation)
+{
 }

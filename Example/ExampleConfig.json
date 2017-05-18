@@ -4,6 +4,7 @@
     "Project" : "Example.uproject",
     "Autoplay" :
     [
+        "VRTest",
         "TouchTest",
         "InputTest"
     ]
