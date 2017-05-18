@@ -89,6 +89,8 @@ void UAutoplayGameViewportClient::Tick(float DeltaTime)
 
 		if (Records.Num() <= PlayIndex)
 		{
+			SaveResult();
+
 			FString configPath;
 
 			if (FParse::Value(FCommandLine::Get(), TEXT("autoplay"), configPath))
@@ -190,13 +192,6 @@ void UAutoplayGameViewportClient::BeginDestroy()
 			FFileHelper::SaveStringToFile(outputString, *path);
 		}
 	}
-	else if (State == EAutoplayState::Playing)
-	{
-		auto directory = FPaths::Combine(FPaths::GameDir(), "Tests/Result");
-		auto path = FPaths::Combine(directory, TestMapName + ".json");
-
-		FFileHelper::SaveStringToFile(Result.ToJson(true), *path);
-	}
 
 	Super::BeginDestroy();
 }
@@ -222,4 +217,15 @@ void UAutoplayGameViewportClient::InitLevel(const FString& MapName)
 {
 	TestMapName = MapName;
 	LoadRecords();
+}
+
+void UAutoplayGameViewportClient::SaveResult()
+{
+	auto directory = FPaths::Combine(FPaths::GameDir(), "Tests/Result");
+	auto path = FPaths::Combine(directory, TestMapName + ".json");
+
+	FFileHelper::SaveStringToFile(Result.ToJson(false), *path);
+
+	Records.Reset();
+	Result = FAutoplayResult();
 }

@@ -17,7 +17,7 @@ Copy Autoplay plugin into your project's Plugins folder. after install the Autop
 
 ## How to use
 
-in auto play, one level is one test case. record your input and play that inputs, that level's game state must satisfy assertions you descripted. Autoplay checks all assertions and save result.
+in auto play, one level is one test case. record your input and play that inputs, that level's game state must satisfy assertions you described. Autoplay checks all assertions and save result.
 
 1. make your test level.
 2. test level must have one Autoplay manager. add Autoplay manager Actor into the level.
@@ -38,15 +38,18 @@ you can use these functions to check your input works correctly.
 
 ## How to use Autoplay script
 
-### Config fields
+first, you make your script's configuration file(json format). configuration options are described below.
 
-- Use Editor : if true, use UE4Editor.exe to play test case. if false, it considered Project field value as executable file(build binary file).
-- Editor Path : path that UE4Editor.exe exists. if Use Editor field set false, this field ignored.
+### Configuration file fields
+
+- UseEditor : if true, use UE4Editor.exe to play test case. if false, it considered Project field value as executable file(build binary file).
+- EditorPath : path that UE4Editor.exe exists. if Use Editor field set false, this field ignored.
 - Project : test project name. you can use absolute path or relative path.
 - Autoplay : test case list. for example, if you set this field to [ "MoveTest", "ShootTest", "DeadTest" ], Autoplay will test these three case step by step(MoveTest.umap & MoveTest.json, ShootTest.umap & ShootTest.json, DeadTest.umap & DeadTest.json) and print all test results.
 
 ## TO DO
 - [ ] record VR HMD & motion controller input
+- [ ] track mouse position
 - [ ] network test
 - [ ] check unreal engine log & game crash
 - [ ] integrate unreal engine automation test framework

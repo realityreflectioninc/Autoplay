@@ -59,6 +59,8 @@ public:
 
 	void InitLevel(const FString& MapName);
 
+	void SaveResult();
+
 private:
 	int PlayIndex;
 
