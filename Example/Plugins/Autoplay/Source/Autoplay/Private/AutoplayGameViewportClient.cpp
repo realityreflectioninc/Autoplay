@@ -3,8 +3,8 @@
 #include "Autoplay.h"
 #include "AutoplayGameViewportClient.h"
 #include "AutoplayManager.h"
+#include "AutoplayConfig.h"
 #include "JsonObjectConverter.h"
-
 
 bool UAutoplayGameViewportClient::InputKey(FViewport* Viewport, int32 ControllerId, FKey Key, EInputEvent EventType, float AmountDepressed, bool bGamepad)
 {
@@ -89,7 +89,42 @@ void UAutoplayGameViewportClient::Tick(float DeltaTime)
 
 		if (Records.Num() <= PlayIndex)
 		{
-			GetWorld()->GetFirstPlayerController()->ConsoleCommand("quit");
+			FString configPath;
+
+			if (FParse::Value(FCommandLine::Get(), TEXT("autoplay"), configPath))
+			{
+				FString fileContents;
+
+				FFileHelper::LoadFileToString(fileContents, *configPath);
+				FAutoplayConfig config;
+
+				FJsonObjectConverter::JsonObjectStringToUStruct(fileContents, &config, 0, 0);
+
+				int nextIndex = -1;
+
+				for (int i = 0; i < config.Autoplay.Num(); i++)
+				{
+					if (TestMapName == config.Autoplay[i])
+					{
+						nextIndex = i + 1;
+						break;
+					}
+				}
+
+				if (nextIndex == config.Autoplay.Num() || nextIndex == -1)
+				{
+					GetWorld()->GetFirstPlayerController()->ConsoleCommand("quit");
+				}
+				else
+				{
+					GetWorld()->GetFirstPlayerController()->ConsoleCommand("open " + config.Autoplay[nextIndex]);
+				}
+			}
+			else
+			{
+				GetWorld()->GetFirstPlayerController()->ConsoleCommand("quit");
+			}
+
 			return;
 		}
 
@@ -149,9 +184,8 @@ void UAutoplayGameViewportClient::BeginDestroy()
 
 		if (FJsonSerializer::Serialize(serializedData, writer))
 		{
-			auto levelName = UGameplayStatics::GetCurrentLevelName(GetWorld());
 			auto directory = FPaths::Combine(FPaths::GameDir(), "Tests");
-			auto path = FPaths::Combine(directory, levelName + ".json");
+			auto path = FPaths::Combine(directory, TestMapName + ".json");
 
 			FFileHelper::SaveStringToFile(outputString, *path);
 		}
@@ -159,7 +193,7 @@ void UAutoplayGameViewportClient::BeginDestroy()
 	else if (State == EAutoplayState::Playing)
 	{
 		auto directory = FPaths::Combine(FPaths::GameDir(), "Tests/Result");
-		auto path = FPaths::Combine(directory, "result.json");
+		auto path = FPaths::Combine(directory, TestMapName + ".json");
 
 		FFileHelper::SaveStringToFile(Result.ToJson(true), *path);
 	}
@@ -174,14 +208,18 @@ void UAutoplayGameViewportClient::LoadRecords()
 		return;
 
 	FString str;
-
-	auto levelName = UGameplayStatics::GetCurrentLevelName(GetWorld());
 	auto directory = FPaths::Combine(FPaths::GameDir(), "Tests");
-	auto path = FPaths::Combine(directory, levelName + ".json");
+	auto path = FPaths::Combine(directory, TestMapName + ".json");
 	FFileHelper::LoadFileToString(str, *path);
 
 	FJsonObjectConverter::JsonArrayStringToUStruct(str, &Records, 0, 0);
 	PlayIndex = 0;
 
 	bCompleteLoadRecords = true;
+}
+
+void UAutoplayGameViewportClient::InitLevel(const FString& MapName)
+{
+	TestMapName = MapName;
+	LoadRecords();
 }

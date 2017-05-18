@@ -1,0 +1,10 @@
+{
+    "UseEditor" : true,
+    "EditorPath" : "D:\\UE_4.15\\Engine\\Binaries\\Win64",
+    "Project" : "Example.uproject",
+    "Autoplay" :
+    [
+        "TouchTest",
+        "InputTest"
+    ]
+}

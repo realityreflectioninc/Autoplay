@@ -3,11 +3,11 @@
 	"EngineAssociation": "4.15",
 	"Category": "",
 	"Description": "",
-	"Modules": [
-		{
-			"Name": "Example",
-			"Type": "Runtime",
-			"LoadingPhase": "Default"
-		}
-	]
+  "Modules": [
+    {
+      "Name": "Example",
+      "Type": "Runtime",
+      "LoadingPhase": "Default"
+    }
+  ]
 }

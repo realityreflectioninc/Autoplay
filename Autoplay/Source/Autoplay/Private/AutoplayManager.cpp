@@ -23,7 +23,7 @@ void AAutoplayManager::BeginPlay()
 	if (viewport == nullptr)
 		return;
 
-	viewport->LoadRecords();
+	viewport->InitLevel(UGameplayStatics::GetCurrentLevelName(GetWorld()));
 }
 
 // Called every frame

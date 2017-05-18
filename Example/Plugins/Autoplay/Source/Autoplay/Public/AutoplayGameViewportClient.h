@@ -57,10 +57,12 @@ public:
 			*val = *val + 1;
 	}
 
+	void InitLevel(const FString& MapName);
 
 private:
 	int PlayIndex;
 
+	FString TestMapName;
 	EAutoplayState State;
 
 	bool bCompleteLoadRecords = false;

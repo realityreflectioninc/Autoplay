@@ -6,7 +6,7 @@ public class Example : ModuleRules
 {
 	public Example(TargetInfo Target)
 	{
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Autoplay" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
