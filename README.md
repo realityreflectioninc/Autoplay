@@ -46,7 +46,7 @@ first, you make your script's configuration file(json format). configuration opt
 - Autoplay : test case list. for example, if you set this field to [ "MoveTest", "ShootTest", "DeadTest" ], Autoplay will test these three case step by step(MoveTest.umap & MoveTest.json, ShootTest.umap & ShootTest.json, DeadTest.umap & DeadTest.json) and print all test results.
 
 ## TO DO
-- [ ] record, play VR HMD & motion controller input
+- [ ] add documentation about How to use
 - [ ] track mouse position
 - [ ] network test
 - [ ] work with CI tools
