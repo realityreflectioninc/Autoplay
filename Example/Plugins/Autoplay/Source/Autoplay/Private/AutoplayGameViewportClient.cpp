@@ -4,6 +4,7 @@
 #include "AutoplayGameViewportClient.h"
 #include "AutoplayManager.h"
 #include "AutoplayConfig.h"
+#include "HeadMountedDisplay.h"
 #include "JsonObjectConverter.h"
 
 bool UAutoplayGameViewportClient::InputKey(FViewport* Viewport, int32 ControllerId, FKey Key, EInputEvent EventType, float AmountDepressed, bool bGamepad)
@@ -153,6 +154,22 @@ void UAutoplayGameViewportClient::Tick(float DeltaTime)
 
 		while (RightPlayIndex < Records.RightInputs.Num() && Records.RightInputs[RightPlayIndex].Time < time)
 			RightPlayIndex++;
+
+		while (HMDPlayIndex < Records.HMDInputs.Num() && Records.HMDInputs[HMDPlayIndex].Time < time)
+			HMDPlayIndex++;
+	}
+	else if (State == EAutoplayState::Recording)
+	{
+		//vr hmd recording
+		if (GEngine->HMDDevice.IsValid())
+		{
+			FVector position;
+			FQuat orientation;
+
+			GEngine->HMDDevice->GetCurrentOrientationAndPosition(orientation, position);
+
+			RecordHMD(position, orientation.Rotator());
+		}
 	}
 }
 
@@ -224,6 +241,7 @@ void UAutoplayGameViewportClient::SaveResult()
 
 	FFileHelper::SaveStringToFile(Result.ToJson(false), *path);
 	Result = FAutoplayResult();
+	bVRRecord = false;
 }
 
 bool UAutoplayGameViewportClient::IsFinishPlaying() const
@@ -265,6 +283,15 @@ void UAutoplayGameViewportClient::RecordMotionController(EControllerHand Hand, E
 	}
 }
 
-void UAutoplayGameViewportClient::RecordHMD(ETrackingStatus TrackingStatus, const FVector& Position, const FRotator& Orientation)
+void UAutoplayGameViewportClient::RecordHMD(const FVector& Position, const FRotator& Orientation)
 {
+	if (!bVRRecord)
+		return;
+
+	FAutoplayVRRecord record;
+	record.Time = UGameplayStatics::GetRealTimeSeconds(GetWorld());
+	record.Position = Position;
+	record.Orientation = Orientation;
+
+	Records.HMDInputs.Add(record);
 }

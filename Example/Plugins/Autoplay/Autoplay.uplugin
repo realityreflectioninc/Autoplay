@@ -19,6 +19,21 @@
         	{
 			"Name": "Autoplay",
 			"Type": "Runtime",
+			"LoadingPhase": "PreDefault"
+		},
+		{
+			"Name": "AutoplayInput",
+			"Type": "Runtime",
+			"LoadingPhase": "PreDefault",
+			"WhitelistPlatforms" :
+			[
+				"Win64",
+				"Win32"
+			]
+		},
+		{
+			"Name": "AutoplayHMD",
+			"Type": "Runtime",
 			"LoadingPhase": "PreDefault",
 			"WhitelistPlatforms" :
 			[

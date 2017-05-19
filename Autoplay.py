@@ -43,7 +43,7 @@ project_path = config["Project"]
 if not os.path.isabs(project_path):
     project_path = os.path.join(os.getcwd(), config["Project"])
 
-subprocess.call([editor_path, project_path, config["Autoplay"][0], "-game", "-autoplay", config_path])
+subprocess.call([editor_path, project_path, config["Autoplay"][0], "-game", "-autoplay", config_path, "hmd=Autoplay"])
 
 for level in config["Autoplay"]:
     # result check

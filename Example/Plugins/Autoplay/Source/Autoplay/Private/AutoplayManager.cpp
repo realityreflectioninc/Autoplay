@@ -74,7 +74,7 @@ void AAutoplayManager::SetVRRecordEnable(bool Enable)
 {
 	auto viewport = Cast<UAutoplayGameViewportClient>(GEngine->GameViewport);
 
-	if (viewport == nullptr || viewport->GetState() != EAutoplayState::Recording)
+	if (viewport == nullptr)
 		return;
 
 	viewport->SetVRRecordEnable(Enable);

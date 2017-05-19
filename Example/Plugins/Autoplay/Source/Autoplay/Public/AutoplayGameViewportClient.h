@@ -59,6 +59,7 @@ public:
 	}
 
 	void SetVRRecordEnable(bool enable) { bVRRecord = enable; }
+	bool IsVRMode() const { return bVRRecord; }
 
 	void InitLevel(const FString& MapName);
 
@@ -67,7 +68,24 @@ public:
 	bool IsFinishPlaying() const;
 
 	void RecordMotionController(EControllerHand Hand, ETrackingStatus TrackingStatus, const FVector& Position, const FRotator& Orientation);
-	void RecordHMD(ETrackingStatus TrackingStatus, const FVector& Position, const FRotator& Orientation);
+	void RecordHMD(const FVector& Position, const FRotator& Orientation);
+
+	FVector GetHMDPosition() const
+	{
+		if (Records.HMDInputs.Num() == 0)
+			return FVector::ZeroVector;
+
+		return Records.HMDInputs[FMath::Min(HMDPlayIndex, Records.HMDInputs.Num() - 1)].Position;
+	}
+
+	FRotator GetHMDOrientation() const
+	{
+		if (Records.HMDInputs.Num() == 0)
+			return FRotator::ZeroRotator;
+
+		return Records.HMDInputs[FMath::Min(HMDPlayIndex, Records.HMDInputs.Num() - 1)].Orientation;
+
+	}
 
 	FVector GetMotionControllerPosition(EControllerHand Hand) const
 	{
