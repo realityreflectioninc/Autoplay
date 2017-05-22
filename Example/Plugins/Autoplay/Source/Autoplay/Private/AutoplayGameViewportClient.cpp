@@ -94,8 +94,11 @@ void UAutoplayGameViewportClient::Tick(float DeltaTime)
 
 			FString configPath;
 
-			if (FParse::Value(FCommandLine::Get(), TEXT("autoplay"), configPath))
+			if (FParse::Value(FCommandLine::Get(), TEXT("autoplaymaps="), configPath))
 			{
+				configPath = configPath.Replace(TEXT("\\\""), TEXT("")).Replace(TEXT("\""), TEXT(""));
+
+				UE_LOG(LogTemp, Log, TEXT("%s"), *configPath);
 				FString fileContents;
 
 				FFileHelper::LoadFileToString(fileContents, *configPath);

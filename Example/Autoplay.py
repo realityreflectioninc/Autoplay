@@ -2,6 +2,7 @@ import json
 import os
 import subprocess
 import sys
+import shutil
 
 class bcolors:
     HEADER = '\033[95m'
@@ -37,13 +38,15 @@ editor_path = os.path.abspath(editor_path)
 passed = 0
 failed = 0
 
+shutil.rmtree("Tests\\Result\\")
+
 # auto play
 project_path = config["Project"]
 
 if not os.path.isabs(project_path):
     project_path = os.path.join(os.getcwd(), config["Project"])
 
-subprocess.call([editor_path, project_path, config["Autoplay"][0], "-game", "-autoplay", config_path, "hmd=Autoplay"])
+subprocess.call([editor_path, project_path, config["Autoplay"][0], "-game", "-autoplay", '-autoplaymaps="{}"'.format(config_path), "hmd=Autoplay"])
 
 for level in config["Autoplay"]:
     # result check
